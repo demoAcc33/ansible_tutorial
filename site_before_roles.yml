@@ -1,0 +1,103 @@
+---
+
+- hosts: all
+  become: true
+  pre_tasks:
+  - name: Install updates (Kali)
+    tags: always
+    apt:
+      update_cache: yes
+    changed_when: false
+    when: ansible_distribution == "Kali"
+
+  - name: Install updates (Ubuntu)
+    tags: always
+    apt:  
+      update_cache: yes
+    changed_when: false
+    when: ansible_distribution == "Ubuntu"
+
+- hosts: all
+  become: true
+  tasks:
+
+  - name: add ssh key for user jonathan
+    tags: always
+    authorized_key:
+      user: jonathan
+      key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHtT0ZRyWUYAodpwPZ1SisTJmScLmthjIyb7exxtjmax ansible"
+
+
+- hosts: workstations
+  become: true
+  tasks:
+
+  - name: install unzip
+    package:
+      name: unzip
+
+  - name: install terraform
+    unarchive: 
+      src: https://releases.hashicorp.com/terraform/1.5.3/terraform_1.5.3_linux_amd64.zip
+      dest: /usr/local/bin
+      remote_src: yes
+      mode: 0755
+      owner: root
+      group: root
+
+- hosts: web_servers
+  become: true
+  tasks:
+    
+  - name: install apache and php for ubuntu
+    tags: apache,apache2,ubuntu
+    apt:
+      name:
+        - apache2
+        - libapache2-mod-php
+      state: latest
+    when: ansible_distribution == "Ubuntu"
+
+  - name: install apache and php for Kali servers
+    tags: apache,kali,apache2
+    apt:
+      name:
+        - apache2
+        - libapache2-mod-php
+      state: latest
+    when: ansible_distribution == "Kali"
+
+  - name: copy default html file for the site
+    tags: apache, apache2, httpd
+    copy:
+      src: default_site.html
+      dest: /var/www/html/index.html
+      owner: root
+      group: root
+      mode: 0644
+ 
+  - name: enable and start the apache service
+    tags: enabled
+    service:
+      name: apache2
+      state: started
+      enabled: yes
+    when: ansible_distribution == "Ubuntu"
+
+- hosts: db_servers
+  become: true
+  tasks:
+
+    - name: install mariadb package (Kali)
+      tags: kali,db,mariadb
+      apt:
+        name: mariadb-server
+        state: latest
+      when: ansible_distribution == "Kali"
+
+    - name: install mariadb package (Ubuntu)
+      tags: ubuntu,db,mariadb
+      apt:
+        name: mariadb-server
+        state: latest
+      when: ansible_distribution == "Ubuntu"
