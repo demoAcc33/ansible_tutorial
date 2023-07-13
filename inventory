@@ -4,4 +4,7 @@ chris@10.0.2.6
 
 [db_servers] 
 master@10.0.2.5
+
+[workstations]
+ansible@10.0.2.15
  
