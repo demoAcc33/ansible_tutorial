@@ -1,13 +1,5 @@
-- name: install mariadb package (Kali)
+- name: install mariadb package
   tags: kali,db,mariadb
   apt:
-    name: mariadb-server
+    name: "{{ mariadb_package_name }}"
     state: latest
-  when: ansible_distribution == "Kali"
-
-- name: install mariadb package (Ubuntu)
-  tags: ubuntu,db,mariadb
-  apt:
-    name: mariadb-server
-    state: latest
-  when: ansible_distribution == "Ubuntu"

@@ -1,20 +1,10 @@
-- name: install apache and php for ubuntu
-  tags: apache,apache2,ubuntu
+- name: install apache and php packages
+  tags: apache,apache2,php
   apt:
     name:
-      - apache2
-      - libapache2-mod-php
+      - "{{ apache_package_name }}"
+      - "{{ php_package_name }}"
     state: latest
-  when: ansible_distribution == "Ubuntu"
-
-- name: install apache and php for Kali servers
-  tags: apache,kali,apache2
-  apt:
-    name:
-      - apache2
-      - libapache2-mod-php
-    state: latest
-  when: ansible_distribution == "Kali"
 
 - name: copy default html file for the site
   tags: apache, apache2, httpd
@@ -28,7 +18,6 @@
 - name: enable and start the apache service
   tags: enabled
   service:
-     name: apache2
+     name: "{{ apache_service }}"
      state: started
      enabled: yes
-  when: ansible_distribution == "Ubuntu"
