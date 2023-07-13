@@ -1,0 +1,58 @@
+---
+
+- hosts: all
+  become: true
+  pre_tasks:
+  - name: Install updates (Kali)
+    tags: always
+    apt:
+      update_cache: yes
+      state: latest
+    when: ansible_distribution == "Kali"
+
+  - name: Install updates (Ubuntu)
+    tags: always
+    apt: 
+      upgrade: dist
+      update_cache: yes
+    when: ansible_distribution == "Ubuntu"
+
+- hosts: web_servers
+  become: true
+  tasks:
+    
+  - name: install apache and php for ubuntu
+    tags: apache,apache2,ubuntu
+    apt:
+      name:
+        - apache2
+        - libapache2-mod-php
+      state: latest
+    when: ansible_distribution == "Ubuntu"
+
+  - name: install apache and php for Kali servers
+    tags: apache,kali,apache2
+    apt:
+      name:
+        - apache2
+        - libapache2-mod-php
+      state: latest
+    when: ansible_distribution == "Kali"
+
+- hosts: db_servers
+  become: true
+  tasks:
+
+    - name: install mariadb package (Kali)
+      tags: kali,db,mariadb
+      apt:
+        name: mariadb-server
+        state: latest
+      when: ansible_distribution == "Kali"
+
+    - name: install mariadb package (Ubuntu)
+      tags: ubuntu,db,mariadb
+      apt:
+        name: mariadb-server
+        state: latest
+      when: ansible_distribution == "Ubuntu"
