@@ -7,25 +7,19 @@
     tags: always
     apt:
       update_cache: yes
-      state: latest
+    changed_when: false
     when: ansible_distribution == "Kali"
 
   - name: Install updates (Ubuntu)
     tags: always
-    apt: 
-      upgrade: dist
+    apt:  
       update_cache: yes
+    changed_when: false
     when: ansible_distribution == "Ubuntu"
 
 - hosts: all
   become: true
   tasks:
-
-  - name: create jonathan user
-    tags: always
-    user:
-      name: jonathan
-      groups: root
 
   - name: add ssh key for user jonathan
     tags: always
@@ -33,14 +27,6 @@
       user: jonathan
       key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHtT0ZRyWUYAodpwPZ1SisTJmScLmthjIyb7exxtjmax ansible"
 
-  - name: add sudoers file for jonathan
-    tags: always
-    copy: 
-      src: sudoer_jonathan
-      dest: /etc/sudoers.d/jonathan
-      owner: root
-      group: root
-      mode: 0440 
 
 - hosts: workstations
   become: true
